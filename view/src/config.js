@@ -31,10 +31,10 @@ const config = {
   customComponents: {
     header: () => <div style={{height: '16px', fontFamily: 'Arial', borderTopLeftRadius: '5px', borderTopRightRadius: '5px',
     background: '#EBECED', color: '#4A4A4A', padding: '8px', borderBottom: '1px solid #B8BABA'}}>SATbot</div>,
-    botAvatar: () => <div class="react-chatbot-kit-chat-bot-avatar-container"><img class="react-chatbot-kit-chat-bot-avatar-icon" src="kai.png"/></div>,
-    userAvatar: () => <div class="react-chatbot-kit-user-avatar-container"><img class="react-chatbot-kit-user-avatar-icon" src="kai.png"/></div>
+    // botAvatar: () => <div class="react-chatbot-kit-chat-bot-avatar-container"><img class="react-chatbot-kit-chat-bot-avatar-icon" src="kai.png"/></div>,
+    // userAvatar: () => <div class="react-chatbot-kit-user-avatar-container"><img class="react-chatbot-kit-user-avatar-icon" src="kai.png"/></div>
 
-    // botAvatar: () => <div class="react-chatbot-kit-chat-bot-avatar-container" style={{fontFamily: 'Arial'}}><p class="react-chatbot-kit-chat-bot-avatar-letter">S</p></div>
+    botAvatar: () => <div class="react-chatbot-kit-chat-bot-avatar-container" style={{fontFamily: 'Arial'}}><p class="react-chatbot-kit-chat-bot-avatar-letter">A</p></div>
     // botAvatar: "kai.png",
     // botAvatar: (props) => <div class="react-chatbot-kit-chat-bot-avatar-container">
     //      <img src="kai.png"/> </div>

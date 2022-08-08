@@ -60,9 +60,9 @@ args = argparse.Namespace(**args_dict)
 
 #load emotion classifier (T5 small)
 with torch.no_grad():
-    emo_model = torch.load('lr2.pt')
-    # emo_model = T5FineTuner(args)
-    # emo_model.load_state_dict(torch.load('T5_small_emotion.pt', map_location=torch.device('cpu')))
+    # emo_model = torch.load('lr2.pt')
+    emo_model = T5FineTuner(args)
+    emo_model.load_state_dict(torch.load('T5_small_emotion.pt', map_location=torch.device('cpu')))
 
 #load empathy classifier (T5 small)
 with torch.no_grad():
@@ -86,20 +86,20 @@ def get_emotion(text):
   '''
   Computes and returns an emotion label given an utterance
   '''
-    # text = re.sub(r'[^\w\s]', '', text)
-    # text = text.lower()
-    # with torch.no_grad():
-    #     input_ids = emo_model.tokenizer.encode(text + '</s>', return_tensors='pt')
-    #     output = emo_model.model.generate(input_ids=input_ids, max_length=2)
-    #     dec = [emo_model.tokenizer.decode(ids) for ids in output]
-    # label = dec[0]
-    # return label
   text = re.sub(r'[^\w\s]', '', text)
   text = text.lower()
-  vectorized = pickle.load(open("vector.pickel", "rb"))
-  vector = vectorized.transform([text])
-  label = emo_model.predict(vector)[0]
+  with torch.no_grad():
+    input_ids = emo_model.tokenizer.encode(text + '</s>', return_tensors='pt')
+    output = emo_model.model.generate(input_ids=input_ids, max_length=2)
+    dec = [emo_model.tokenizer.decode(ids) for ids in output]
+  label = dec[0]
   return label
+  # text = re.sub(r'[^\w\s]', '', text)
+  # text = text.lower()
+  # vectorized = pickle.load(open("vector.pickel", "rb"))
+  # vector = vectorized.transform([text])
+  # label = emo_model.predict(vector)[0]
+  # return label
 
 def empathy_score(text):
   '''
