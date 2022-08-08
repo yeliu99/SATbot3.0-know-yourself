@@ -39,6 +39,8 @@ def create_app():
 
     # Pull from config file
     app.config.from_object(Config)
+    # app.config['CORS_HEADERS'] = 'Content-Type'
+
     db.init_app(app)  # <- This will get called in our models.py file
     migrate.init_app(app, db)  # <- Migration directory
 
