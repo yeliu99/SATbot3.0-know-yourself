@@ -894,7 +894,7 @@ class ModelDecisionMaker:
                 "model_prompt": lambda user_id, db_session, curr_session, app: self.get_restart_prompt(user_id),
 
                 "choices": {
-                    "open_text": lambda user_id, db_session, curr_session, app: self.determine_next_prompt_opening(
+                    "open_text": lambda user_id, db_session, curr_session, app: self.determine_next_prompt_opening_restart(
                         user_id, app, db_session)
                 },
                 "protocols": {"open_text": []},
@@ -1032,13 +1032,14 @@ class ModelDecisionMaker:
         name = self.users_names[user_id] if self.users_names[user_id] != "" else "there"
         welcome = "Hi " + name + "! Nice to meet you!"
         intro_prompt0 = "My name is Alex, your emotional support assistant."
-        intro_prompt1 = "I'm here to help you to understand some of the defense mechanisms that you may unconsciously employ when you encounter negative emotions."
-        intro_prompt2 = "To start, please could you tell me how you are feeling today?"
+        intro_prompt1 = "I'm here to help externalize your emotions to your childhood-self and analyze them from a third person point of view."
+        intro_prompt2 = "This makes it easier to recofnize defense mechanisms that you unconsciously employ when you encounter negative emotions."
+        intro_prompt3 = "To start, please could you tell me how you are feeling today?"
         # if self.users_names[user_id] == "":
         #     opening_prompt = ["Hello, this is " + self.chosen_personas[user_id] + ". ", "How are you feeling today?"]
         # else:
         #     opening_prompt = ["Hello " + self.users_names[user_id] + ", this is " + self.chosen_personas[user_id] + ". ", "How are you feeling today?"]
-        return welcome, intro_prompt0, intro_prompt1, intro_prompt2
+        return welcome, intro_prompt0, intro_prompt1, intro_prompt2, intro_prompt3
 
     # def get_opening_prompt(self, user_id):
     #     if self.users_names[user_id] == "":
@@ -1156,6 +1157,27 @@ class ModelDecisionMaker:
     def determine_next_prompt_opening(self, user_id, app, db_session):
         user_response = self.user_choices[user_id]["choices_made"]["intro_prompt"]
         emotion = get_emotion(user_response)
+        if emotion == 'fear':
+            self.guess_emotion_predictions[user_id] = 'anxious'
+            self.user_emotions[user_id] = 'anxious'
+        elif emotion == 'sadness':
+            self.guess_emotion_predictions[user_id] = 'sad'
+            self.user_emotions[user_id] = 'sad'
+        elif emotion == 'anger':
+            self.guess_emotion_predictions[user_id] = 'angry'
+            self.user_emotions[user_id] = 'angry'
+        else:
+            self.guess_emotion_predictions[user_id] = 'happy'
+            self.user_emotions[user_id] = 'happy'
+        # self.guess_emotion_predictions[user_id] = emotion
+        # self.user_emotions[user_id] = emotion
+        return "guess_emotion"
+
+    def determine_next_prompt_opening_restart(self, user_id, app, db_session):
+        user_response = self.user_choices[user_id]["choices_made"]["restart_prompt"]
+        print(user_response)
+        emotion = get_emotion(user_response)
+        print(emotion)
         if emotion == 'fear':
             self.guess_emotion_predictions[user_id] = 'anxious'
             self.user_emotions[user_id] = 'anxious'
