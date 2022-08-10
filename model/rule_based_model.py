@@ -191,7 +191,8 @@ class ModelDecisionMaker:
                     "Angry": lambda user_id, db_session, curr_session, app: self.get_angry_emotion(user_id),
                     "Anxious/Scared": lambda user_id, db_session, curr_session, app: self.get_anxious_emotion(user_id),
                     "Happy/Content": lambda user_id, db_session, curr_session, app: self.get_happy_emotion(user_id),
-                    "Others, but positive feelings": lambda user_id, db_session, curr_session, app: self.get_positive_emotion(user_id),
+                    "Others, but positive feelings": lambda user_id, db_session, curr_session,
+                                                            app: self.get_positive_emotion(user_id),
                     "Others, but negative feelings": lambda user_id, db_session, curr_session,
                                                             app: self.get_negative_emotion(user_id),
 
@@ -698,7 +699,7 @@ class ModelDecisionMaker:
                                                                                                            db_session),
 
                 "choices": {
-                    "Continue": "after_classification_negative",
+                    "Continue": "check_emotion_after_happy",
                     "See suggestions": "suggestions",
                     "End the session": "ending_prompt"
                 },
@@ -708,6 +709,31 @@ class ModelDecisionMaker:
                     # [self.PROTOCOL_TITLES[k] for k in self.positive_protocols],
                     "See suggestions": [],
                     "End the session": []
+                },
+            },
+
+            "check_emotion_after_happy": {
+                "model_prompt": lambda user_id, db_session, curr_session,
+                                       app: self.get_model_prompt_check_emotion_after_happy(
+                    user_id, app, db_session),
+
+                "choices": {
+                    # "Positive": lambda user_id, db_session, curr_session, app: self.get_positive_emotion(user_id),
+                    # "Negative": lambda user_id, db_session, curr_session, app: self.get_negative_emotion(user_id),
+                    "Sad": lambda user_id, db_session, curr_session, app: self.get_sad_emotion(user_id),
+                    "Angry": lambda user_id, db_session, curr_session, app: self.get_angry_emotion(user_id),
+                    "Anxious/Scared": lambda user_id, db_session, curr_session, app: self.get_anxious_emotion(user_id),
+                    "Other negative feelings": lambda user_id, db_session, curr_session,
+                                                      app: self.get_negative_emotion(user_id),
+
+                },
+                "protocols": {
+                    # "Positive": [],
+                    # "Negative": []
+                    "Sad": [],
+                    "Angry": [],
+                    "Anxious/Scared": [],
+                    "Other negative feelings": []
                 },
             },
 
@@ -771,11 +797,19 @@ class ModelDecisionMaker:
             "tip1": {
                 "model_prompt": lambda user_id, db_session, curr_session, app: self.get_model_prompt_tip1(
                     user_id, app, db_session),
-                "choices": {"Continue": lambda user_id, db_session, curr_session,
-                                               app: self.get_model_prompt_tip2(
-                    user_id, app, db_session),
+                "choices": {"Continue": "tip2",
+                            "End": "ending_prompt",
                             },
-                "protocols": {"Continue": [], },
+                "protocols": {"Continue": [],
+                              "End": [], },
+            },
+
+            "tip2": {
+                "model_prompt": lambda user_id, db_session, curr_session, app: self.get_model_prompt_tip2(
+                    user_id, app, db_session),
+                "choices": {"End": "ending_prompt",
+                            },
+                "protocols": {"End": [], },
             },
 
             "user_found_useful": {
@@ -800,9 +834,7 @@ class ModelDecisionMaker:
                                                                                                                 db_session),
 
                 "choices": {
-                    "Yes , I'd like to see other suggestions": lambda user_id, db_session, curr_session,
-                                                               app: self.get_model_prompt_tip1(
-                        user_id, app, db_session),
+                    "Yes, I'd like to see other suggestions": "tip1",
                     # "Yes (replay)": "restart_prompt",
                     "No (end session)": "ending_prompt",
                 },
@@ -819,14 +851,12 @@ class ModelDecisionMaker:
                                                                                                                db_session),
 
                 "choices": {
-                    "Yes , I'd like to see other suggestions": lambda user_id, db_session, curr_session,
-                                                               app: self.get_model_prompt_tip1(
-                        user_id, app, db_session),
+                    "Yes, I'd like to see other suggestions": "tip1",
                     # "Yes (replay)": "restart_prompt",
                     "No (end session)": "ending_prompt",
                 },
                 "protocols": {
-                    "Yes , I'd like to see other suggestions": [],
+                    "Yes, I'd like to see other suggestions": [],
                     # "Yes (replay)": [],
                     "No (end session)": []
                 },
@@ -840,14 +870,12 @@ class ModelDecisionMaker:
                 ],
 
                 "choices": {
-                    "Yes , I'd like to see other suggestions": lambda user_id, db_session, curr_session,
-                                                               app: self.get_model_prompt_tip1(
-                        user_id, app, db_session),
+                    "Yes, I'd like to see other suggestions": "tip1",
                     # "Yes (restart questions)": "restart_prompt",
                     "No (end session)": "ending_prompt",
                 },
                 "protocols": {
-                    "Yes , I'd like to see other suggestions": [],
+                    "Yes, I'd like to see other suggestions": [],
                     # "Yes (restart questions)": [],
                     "No (end session)": []
                 },
@@ -918,7 +946,7 @@ class ModelDecisionMaker:
         try:
             user_response = self.user_choices[user_id]["choices_made"]["specify_antisocial_emotion"]
         except:  # noqa
-            user_response = "general negative feeling"
+            user_response = "negative feeling"
         self.users_feelings[user_id] = user_response
         return "check_A_antisocial_emotion"
 
@@ -1051,7 +1079,8 @@ class ModelDecisionMaker:
 
     def get_next_question_after_denial(self, user_id):
         self.remaining_choices[user_id].remove("check_targetB")
-        self.remaining_choices[user_id].remove("check_reaction_formation") # delete check_targetB from remaining_choices
+        self.remaining_choices[user_id].remove(
+            "check_reaction_formation")  # delete check_targetB from remaining_choices
 
         if self.remaining_choices[user_id] == []:
             return "no_mechanism_detected"
@@ -1066,14 +1095,15 @@ class ModelDecisionMaker:
 
     def get_displacement(self, user_id):
         question = "Thank you, I really appreciate your time and patience. From what you've told me, it is possible that you are using displacement mechanism. This happens when you redirect your negative emotion from its original source to a less threatening recipient."
-        return self.split_sentence(question), "In your case, it looks like you redirect your {} from {} to {}.".format(
+        question += " In your case, it looks like you redirect your {} from {} to {}.".format(
             self.users_feelings[user_id], self.targetA_names[user_id], self.targetB_names[user_id])
+        return self.split_sentence(question)
 
     def get_transference(self, user_id):
         question = "Great job, you've done so well with this. Thank you very much for your time and efforts. It seems like you are using transference mechanism. This usually happens when you redirect some of your feelings about one person (usually your primary caregiver) to an entirely different person."
-        return self.split_sentence(
-            question), "In your case, it looks like you transfer your feelings from your primary caregiver to {} due to their similarities.".format(
+        question += " In your case, it looks like you transfer your {} from your primary caregiver to {} due to their similarities.".format(
             self.users_feelings[user_id], self.targetA_names[user_id])
+        return self.split_sentence(question)
 
     def get_regression(self, user_id):
         question = "Thank you very much, I really appreciate your cooperation. I think you are probably using regression mechanism. It is a way to protect yourself in stressful events by going back in time to a period when you safe, instead of handling the unacceptable facts in a more adult manner."
@@ -1081,34 +1111,36 @@ class ModelDecisionMaker:
 
     def get_projection(self, user_id):
         question = "Great job, I really appreciate your cooperation. From what you've told me, you are probably using projection mechanism. Projection happens when you recognize your unacceptable thoughts in someone else to avoid recognizing those thoughts in yourself subconsciously."
-        return self.split_sentence(question), "In your case, it's likely you attribute your {} to {}.".format(
+        question += " In your case, it's likely you attribute your {} to {}.".format(
             self.users_feelings[user_id], self.targetA_names[user_id])
+        return self.split_sentence(question)
 
     def get_projection_internal(self, user_id):
-        question = "Thank you very much! From what you have told me, it's likely that you are using projection mechanism. It's possible you project the internal persecutor to yourself and thus develop an inner persecutor as a way to protect yourself."
+        question = "Thank you very much! From what you have told me, it's likely that you are using the internal persecutor. It's possible you direct the internal persecutor to yourself and thus develop an inner persecutor as a way to protect yourself."
         # return "Thank you, I really appreciate your cooperation. It looks like you are using projection mechanism. This usually happens when you recognize your unacceptable traits or impulses in someone else to avoid recognizing those traits or impulses in yourself subconsciously."
         return self.split_sentence(question)
 
     def get_reaction_formation(self, user_id):
         question = "Thanks a lot, I really appreciate your cooperation. It's possible that you are using reaction formation mechanism. This usually happens when you unconsciously behaves in the opposite way to which you think or feel, in order to hide your true feelings."
-        return self.split_sentence(
-            question), "In your case, it looks like you treat {} in a very friendly way to hide your {}.".format(
+        question += " In your case, it looks like you treat {} in a very friendly way to hide your {}.".format(
             self.targetA_names[user_id], self.users_feelings[user_id])
+        return self.split_sentence(question)
 
     def get_projective_identification(self, user_id):
-        question = "Well done, thank you for your trust and cooperation! It looks like you are using projective identification mechanism. This usually happens when you project unacceptable thoughts onto another person, and that person introjects the projected thoughts and believes themselves to be characterized by you appropriately and justifiably."
-        return self.split_sentence(
-            question), "In your case, it's likely you attribute your {} to {}, and somehow {} accepts and resonates this projection, which may cause a fight as a result.".format(
-            self.users_feelings[user_id], self.targetA_names[user_id], self.targetA_names[user_id])
+        question = "Well done, thank you for your trust and cooperation! It looks like you are using projective identification mechanism. This usually happens when you continuously project unacceptable thoughts onto another person, and that person ends up acting or feeling in ways that combine both your projection and their feelings."
+        question += " In your case, it's likely you attribute your {} to {}, and stubbornly accuse {} of showing this negative feeling towards you. Eventually, {} unconsciously accepts this projection, and behaves like they hold this negative attitude towards you, which may cause a fight as a result.".format(
+            self.users_feelings[user_id], self.targetA_names[user_id], self.targetA_names[user_id],
+            self.targetA_names[user_id])
+        return self.split_sentence(question)
 
-    def add_to_reordered_protocols(self, user_id, next_protocol):
-        self.reordered_protocol_questions[user_id].append(next_protocol)
+    # def add_to_reordered_protocols(self, user_id, next_protocol):
+    #     self.reordered_protocol_questions[user_id].append(next_protocol)
 
-    def add_to_next_protocols(self, next_protocols):
-        self.protocols_to_suggest.append(deque(next_protocols))
+    # def add_to_next_protocols(self, next_protocols):
+    #     self.protocols_to_suggest.append(deque(next_protocols))
 
-    def clear_suggested_protocols(self):
-        self.protocols_to_suggest = []
+    # def clear_suggested_protocols(self):
+    #     self.protocols_to_suggest = []
 
     # NOTE: this is not currently used, but can be integrated to support
     # positive protocol suggestions (to avoid recent protocols).
@@ -1159,6 +1191,7 @@ class ModelDecisionMaker:
         if '' in temp_list:
             temp_list.remove('')
         temp_list = [i + " " if i[-1] in [".", "?", "!"] else i for i in temp_list]
+        print(temp_list)
         if len(temp_list) == 2:
             return temp_list[0], temp_list[1]
         elif len(temp_list) == 3:
@@ -1203,6 +1236,15 @@ class ModelDecisionMaker:
         return self.split_sentence(my_string)
         # return "I am sorry. Please select from the emotions below the one that best reflects what you are feeling:"
 
+    def get_model_prompt_check_emotion_after_happy(self, user_id, app, db_session):
+        question = "Bravo, thanks for your cooperation. Please select from the emotions below the one that best reflects what you felt:"
+        if len(self.recent_questions[user_id]) < 50:
+            self.recent_questions[user_id].append(question)
+        else:
+            self.recent_questions[user_id] = []
+            self.recent_questions[user_id].append(question)
+        return self.split_sentence(question)
+
     def get_positive_emotion(self, user_id):
         self.guess_emotion_predictions[user_id] = "positive"
         self.user_emotions[user_id] = "positive"
@@ -1214,7 +1256,7 @@ class ModelDecisionMaker:
         return "after_classification_negative"
 
     def get_angry_feeling(self, user_id):
-        self.users_feelings[user_id] = "angry"
+        self.users_feelings[user_id] = "anger"
         return "check_A_antisocial_emotion"
 
     def get_envy_feeling(self, user_id):
@@ -1285,7 +1327,7 @@ class ModelDecisionMaker:
         #     self.recent_questions[user_id] = []
         #     self.recent_questions[user_id].append(question)
         # return self.split_sentence(question)
-        question = "Thank you, I will help you deal with your emotions in a moment. Before I do that, could you please try to project your negatiive feeling onto your childhood self? Take your time to try this, and press 'Continue' when you feel ready. And I will ask you some questions about your childhood-self to get a better understanding of your situation."
+        question = "Thank you, I will help you deal with your emotions in a moment. Before I do that, could you please try to project your negatiive feeling onto your childhood self? Take your time to try this, and press 'Continue' when you feel ready. And I will ask you some questions about your childhood-self to get a better understanding of your situation, does it sound good to you?"
         return self.split_sentence(question)
 
     # def get_model_prompt_project_emotion(self, user_id, app, db_session):
@@ -1420,12 +1462,13 @@ class ModelDecisionMaker:
         question = self.get_best_sentence(column, prev_qs)
         question1 = "Before I do that, could you please try to project your negative feeling onto your childhood self?"
         question2 = "Take your time to try this, and press 'Continue' when you feel ready."
+        question3 = "Does it sound good to you?"
         if len(self.recent_questions[user_id]) < 50:
             self.recent_questions[user_id].append(question)
         else:
             self.recent_questions[user_id] = []
             self.recent_questions[user_id].append(question)
-        return self.split_sentence(question), question1, question2
+        return self.split_sentence(question), question1, question2, question3
         # return "Thank you. Now I will ask some questions to understand your situation."
 
     def get_model_check_targetA(self, user_id, app, db_session):
@@ -1578,7 +1621,7 @@ class ModelDecisionMaker:
         # return "Has your childhood-self had a fight with " + self.targetA_names[user_id] + " ?"
 
     def get_model_antisocial_behavior(self, user_id, app, db_session):
-        question = "I see, thank you for taking the time to answer all these questions, I am still trying to figure out the best way to help. I wonder if your childhood-self has expressed their " + \
+        question = "I see, thank you for taking the time to answer all these questions, I am still trying to figure out the best way to help. I wonder if your childhood-self has openly expressed their " + \
                    self.users_feelings[user_id] + " towards " + self.targetA_names[
                        user_id] + "?"
         return self.split_sentence(question)
@@ -1653,7 +1696,6 @@ class ModelDecisionMaker:
         # return self.split_sentence(question)
         # return "It is not easy to overcome difficult emotions. For more help, I've put together some tips on how to cope with negative feelings that you might find useful. Are you interested in trying some of them by any chance?"
 
-
     def get_model_prompt_trying_protocol(self, user_id, app, db_session):
         # prev_qs = pd.DataFrame(self.recent_questions[user_id], columns=['sentences'])
         # data = self.datasets
@@ -1667,7 +1709,7 @@ class ModelDecisionMaker:
         #     self.recent_questions[user_id].append(question)
         # return ["You have selected Protocol " + str(self.current_protocol_ids[user_id][0]) + ". ",
         #         self.split_sentence(question)]
-        question = "First of all, it is essential to recognize your negative emotions and act them out in a mature way. Actually, there is a defense mechanism called 'sublimation', which means to displace your unacceptable emotions into constructive and socially acceptable behaviors. Maybe you can try to practice protocl 8, 17 or 18,  I really hope the protocols will make you feel better. Please press 'Continue' when you finish."
+        question = "First of all, it is essential to recognize your negative emotions and deal with them in a mature way. Actually, there is a defense mechanism called 'sublimation', which means to displace your unacceptable emotions into constructive and socially acceptable behaviors. Maybe you can try to practice protocl 8, 17 or 18,  I really hope the protocols will make you feel better. Please press 'Continue' when you finish."
         return self.split_sentence(question)
 
     def get_model_prompt_tip1(self, user_id, app, db_session):
@@ -1695,7 +1737,6 @@ class ModelDecisionMaker:
         prev_qs = pd.DataFrame(self.recent_questions[user_id], columns=['sentences'])
         prev_qs = pd.DataFrame(self.recent_questions[user_id], columns=['sentences'])
         data = self.datasets
-        print(data.columns)
         column = data["Patient feels better"].dropna()
         question = self.get_best_sentence(column, prev_qs)
         if len(self.recent_questions[user_id]) < 50:
