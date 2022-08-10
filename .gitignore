@@ -1,1 +1,4 @@
 *.pyc
+*.pt
+*.db
+__init__.py

@@ -110,7 +110,7 @@ class ModelDecisionMaker:
         self.chosen_personas = {}
         # self.datasets = pd.read_csv('/Users/yeliu/IC/Individual_Project/code/sat3.0/model/sat.csv',
         #                        encoding='ISO-8859-1')
-        self.datasets = pd.read_csv('sat.csv')
+        self.datasets = pd.read_csv('model/sat.csv')
 
         self.QUESTIONS = {
 
