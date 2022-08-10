@@ -60,6 +60,7 @@ font-size: 1.1rem;
 font-weight: medium;
 position: relative;
 text-align: left;
+flex-shrink: 500;
 }
 
 .react-chatbot-kit-chat-bot-message-arrow {
