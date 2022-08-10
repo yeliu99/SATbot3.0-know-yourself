@@ -1157,8 +1157,8 @@ class ModelDecisionMaker:
         user_response = self.user_choices[user_id]["choices_made"]["intro_prompt"]
         emotion = get_emotion(user_response)
         if emotion == 'fear':
-            self.guess_emotion_predictions[user_id] = 'fear'
-            self.user_emotions[user_id] = 'fear'
+            self.guess_emotion_predictions[user_id] = 'anxious'
+            self.user_emotions[user_id] = 'anxious'
         elif emotion == 'sadness':
             self.guess_emotion_predictions[user_id] = 'sad'
             self.user_emotions[user_id] = 'sad'
@@ -1296,8 +1296,8 @@ class ModelDecisionMaker:
         return "after_classification_negative"
 
     def get_anxious_emotion(self, user_id):
-        self.guess_emotion_predictions[user_id] = "fear"
-        self.user_emotions[user_id] = "fear"
+        self.guess_emotion_predictions[user_id] = "anxious"
+        self.user_emotions[user_id] = "anxious"
         return "after_classification_negative"
 
     def get_happy_emotion(self, user_id):
@@ -2064,7 +2064,7 @@ class ModelDecisionMaker:
                 next_choice = next_choice["Sad"]
             elif self.guess_emotion_predictions[user_id] == "angry":
                 next_choice = next_choice["Angry"]
-            elif self.guess_emotion_predictions[user_id] == "fear":
+            elif self.guess_emotion_predictions[user_id] == "anxious":
                 next_choice = next_choice["Anxious/Scared"]
             else:
                 next_choice = next_choice["Happy/Content"]
