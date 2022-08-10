@@ -1033,7 +1033,7 @@ class ModelDecisionMaker:
         welcome = "Hi " + name + "! Nice to meet you!"
         intro_prompt0 = "My name is Alex, your emotional support assistant."
         intro_prompt1 = "I'm here to help externalize your emotions to your childhood-self and analyze them from a third person point of view."
-        intro_prompt2 = "This makes it easier to recofnize defense mechanisms that you unconsciously employ when you encounter negative emotions."
+        intro_prompt2 = "This makes it easier to recognize defense mechanisms that you unconsciously employ when you encounter negative emotions."
         intro_prompt3 = "To start, please could you tell me how you are feeling today?"
         # if self.users_names[user_id] == "":
         #     opening_prompt = ["Hello, this is " + self.chosen_personas[user_id] + ". ", "How are you feeling today?"]
