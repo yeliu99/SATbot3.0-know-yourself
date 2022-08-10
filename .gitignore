@@ -2,3 +2,5 @@
 *.pt
 *.db
 __init__.py
+model/migrations
+view/node_modules
