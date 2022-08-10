@@ -110,7 +110,7 @@ class ModelDecisionMaker:
         self.chosen_personas = {}
         # self.datasets = pd.read_csv('/Users/yeliu/IC/Individual_Project/code/sat3.0/model/sat.csv',
         #                        encoding='ISO-8859-1')
-        self.datasets = pd.read_csv('sat.csv')
+        self.datasets = pd.read_csv('model/sat.csv')
 
         self.QUESTIONS = {
 
@@ -1003,7 +1003,7 @@ class ModelDecisionMaker:
     def get_intro_prompt(self, user_id):
         name = self.users_names[user_id] if self.users_names[user_id] != "" else "there"
         welcome = "Hi " + name + "! Nice to meet you!"
-        intro_prompt0 = "My name is Kai, your emotional support assistant."
+        intro_prompt0 = "My name is Alex, your emotional support assistant."
         intro_prompt1 = "I'm here to help you to understand some of the defense mechanisms that you may unconsciously employ when you encounter negative emotions."
         intro_prompt2 = "To start, please could you tell me how you are feeling today?"
         # if self.users_names[user_id] == "":
