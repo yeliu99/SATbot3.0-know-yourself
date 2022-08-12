@@ -35,6 +35,7 @@ background-color: #fff;
 display: flex;
 justify-content: center;
 align-items: center;
+background: #fff;
 }
 
 .react-chatbot-kit-chat-bot-avatar-icon {
@@ -116,7 +117,7 @@ animation-delay: 0.4s;
   border-radius: 50%;
   margin-left: 0px;
   margin-right: 0px;
-  background-color: #fff;
+  background-color: #2BB741!important;
   display: flex;
   justify-content: center;
   align-items: center;
