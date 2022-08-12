@@ -244,6 +244,12 @@ def create_app():
             }
         return {"validID": False, "userID": None}
 
+    
+    @app.route("/api/test", methods=["GET"])
+    def test():
+        print("success")
+        return "success"
+
     @app.route("/api/update_session", methods=["POST"])
     def update_session():
         user_info = json.loads(request.data)["choice_info"]
