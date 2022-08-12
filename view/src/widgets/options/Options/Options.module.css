@@ -9,13 +9,18 @@
 .option {
   border-radius: 25px;
   padding: 8px;
-  border: 1px solid #4A4A4A;
-  color: #4A4A4A;
+  border: 1px solid #fff;
+  color: #fff;
   font-family: arial;
   font-size: 1.1rem;
   margin: 4px 4px;
-  background: transparent;
+  background: #128C7E;
 }
+
+.option:hover {
+      background-color:#1d1d1d;
+      transition: 0.7s;
+  }
 
 /* .option::selection {
   color: #173e3f;
