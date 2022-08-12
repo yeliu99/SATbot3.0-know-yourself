@@ -84,6 +84,7 @@ width: 25px;
 display: flex;
 width: 100%;
 justify-content: center;
+background: #128C7E;
 }
 
 #chatbot-loader #chatbot-loader-dot1 {
