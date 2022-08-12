@@ -5,3 +5,8 @@ __init__.py
 model/migrations
 view/node_modules
 model/.env
+model/migrations/versions/fb17136a4f72_testdb_table.py
+model/migrations/env.py model/migrations/script.py.mako
+model/app.db
+model/migrations/README
+model/migrations/alembic.ini
